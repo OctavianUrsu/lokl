@@ -25,3 +25,18 @@
 </dl>
 
 <a href="/profile/edit">Edit Profile</a>
+
+{#if data.services.length > 0}
+	<h2>My Services</h2>
+	<ul>
+		{#each data.services as service (service.id)}
+			<li>
+				<a href="/services/{service.id}">
+					<strong>{service.title}</strong>
+				</a>
+				<span> — ${service.price} · {service.category}</span>
+				<a href="/services/{service.id}/edit">Edit</a>
+			</li>
+		{/each}
+	</ul>
+{/if}

@@ -2,7 +2,7 @@ import { redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
-import { profiles } from '$lib/server/schema';
+import { profiles, services } from '$lib/server/schema';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const { session, user } = await locals.safeGetSession();
@@ -20,5 +20,9 @@ export const load: PageServerLoad = async ({ locals }) => {
 		redirect(303, '/signup');
 	}
 
-	return { profile };
+	const myServices = profile.role === 'provider'
+		? await db.select().from(services).where(eq(services.providerId, user.id))
+		: [];
+
+	return { profile, services: myServices };
 };
