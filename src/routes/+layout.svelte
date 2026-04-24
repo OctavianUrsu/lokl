@@ -15,6 +15,7 @@
 		{#if data.session}
 			{#if data.profile?.role === 'provider'}
 				<a href="/services/new">Post Service</a>
+				<a href="/bookings/requests">Requests</a>
 			{/if}
 			<a href="/bookings">Bookings</a>
 			<a href="/profile">Profile</a>
