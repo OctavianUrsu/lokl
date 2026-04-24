@@ -11,10 +11,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 		redirect(303, '/login');
 	}
 
-	const [profile] = await db
-		.select({ role: profiles.role })
-		.from(profiles)
-		.where(eq(profiles.id, user.id));
+	const [profile] = await db.select({ role: profiles.role }).from(profiles).where(eq(profiles.id, user.id));
 
 	if (!profile || profile.role !== 'provider') {
 		redirect(303, '/');
@@ -64,10 +61,7 @@ export const actions: Actions = {
 			return fail(403, { error: 'Not your booking' });
 		}
 
-		await db
-			.update(bookings)
-			.set({ status: 'confirmed', updatedAt: new Date() })
-			.where(eq(bookings.id, bookingId));
+		await db.update(bookings).set({ status: 'confirmed', updatedAt: new Date() }).where(eq(bookings.id, bookingId));
 
 		return { success: true };
 	},
@@ -95,10 +89,7 @@ export const actions: Actions = {
 			return fail(403, { error: 'Not your booking' });
 		}
 
-		await db
-			.update(bookings)
-			.set({ status: 'cancelled', updatedAt: new Date() })
-			.where(eq(bookings.id, bookingId));
+		await db.update(bookings).set({ status: 'cancelled', updatedAt: new Date() }).where(eq(bookings.id, bookingId));
 
 		return { success: true };
 	}

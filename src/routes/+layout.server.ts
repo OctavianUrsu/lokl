@@ -10,10 +10,7 @@ export const load: LayoutServerLoad = async ({ locals }) => {
 		return { session: null, user: null, profile: null };
 	}
 
-	const [profile] = await db
-		.select({ role: profiles.role })
-		.from(profiles)
-		.where(eq(profiles.id, user.id));
+	const [profile] = await db.select({ role: profiles.role }).from(profiles).where(eq(profiles.id, user.id));
 
 	return { session, user, profile: profile ?? null };
 };

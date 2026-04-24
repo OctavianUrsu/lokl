@@ -7,3 +7,8 @@ bun.lockb
 
 # Miscellaneous
 /static/
+
+# Generated / external
+.agents/
+drizzle/
+skills-lock.json

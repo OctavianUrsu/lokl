@@ -35,15 +35,7 @@
 	</div>
 	<div>
 		<label for="price">Price ($)</label>
-		<input
-			type="number"
-			name="price"
-			id="price"
-			min="0.01"
-			step="0.01"
-			value={data.service.price}
-			required
-		/>
+		<input type="number" name="price" id="price" min="0.01" step="0.01" value={data.service.price} required />
 	</div>
 	<div>
 		<label for="location">Location (optional)</label>

@@ -40,12 +40,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		const [existing] = await db
 			.select({ id: bookings.id })
 			.from(bookings)
-			.where(
-				and(
-					eq(bookings.serviceId, service.id),
-					eq(bookings.customerId, user.id)
-				)
-			);
+			.where(and(eq(bookings.serviceId, service.id), eq(bookings.customerId, user.id)));
 		hasActiveBooking = !!existing;
 	}
 

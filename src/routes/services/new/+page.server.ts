@@ -11,10 +11,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 		redirect(303, '/login');
 	}
 
-	const [profile] = await db
-		.select({ role: profiles.role })
-		.from(profiles)
-		.where(eq(profiles.id, user.id));
+	const [profile] = await db.select({ role: profiles.role }).from(profiles).where(eq(profiles.id, user.id));
 
 	if (!profile || profile.role !== 'provider') {
 		redirect(303, '/');

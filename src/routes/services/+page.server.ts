@@ -20,9 +20,7 @@ export const load: PageServerLoad = async ({ url }) => {
 		.from(services)
 		.innerJoin(profiles, eq(services.providerId, profiles.id));
 
-	const results = category
-		? await query.where(eq(services.category, category))
-		: await query;
+	const results = category ? await query.where(eq(services.category, category)) : await query;
 
 	return { services: results, category };
 };

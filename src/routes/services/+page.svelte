@@ -1,16 +1,7 @@
 <script lang="ts">
 	let { data } = $props();
 
-	const categories = [
-		'cleaning',
-		'plumbing',
-		'electrical',
-		'gardening',
-		'moving',
-		'painting',
-		'tutoring',
-		'other'
-	];
+	const categories = ['cleaning', 'plumbing', 'electrical', 'gardening', 'moving', 'painting', 'tutoring', 'other'];
 </script>
 
 <h1>Browse Services</h1>

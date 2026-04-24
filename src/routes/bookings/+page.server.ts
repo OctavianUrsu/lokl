@@ -49,10 +49,7 @@ export const actions: Actions = {
 		if (booking.customerId !== user.id) return fail(403, { error: 'Not your booking' });
 		if (booking.status !== 'confirmed') return fail(400, { error: 'Booking must be confirmed first' });
 
-		await db
-			.update(bookings)
-			.set({ status: 'completed', updatedAt: new Date() })
-			.where(eq(bookings.id, bookingId));
+		await db.update(bookings).set({ status: 'completed', updatedAt: new Date() }).where(eq(bookings.id, bookingId));
 
 		return { success: true };
 	}
