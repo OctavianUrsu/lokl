@@ -20,7 +20,13 @@ export const actions: Actions = {
 			return fail(400, { error: 'Passwords do not match.' });
 		}
 
-		const { data, error } = await locals.supabase.auth.signUp({ email, password });
+		const { data, error } = await locals.supabase.auth.signUp({
+			email,
+			password,
+			options: {
+				emailRedirectTo: `${new URL(request.url).origin}/auth/callback`
+			}
+		});
 
 		if (error) {
 			return fail(400, { error: error.message });
