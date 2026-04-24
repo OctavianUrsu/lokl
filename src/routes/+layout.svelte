@@ -16,6 +16,7 @@
 			{#if data.profile?.role === 'provider'}
 				<a href="/services/new">Post Service</a>
 			{/if}
+			<a href="/bookings">Bookings</a>
 			<a href="/profile">Profile</a>
 			<form method="POST" action="/logout" style="display:inline">
 				<button type="submit">Sign Out</button>
