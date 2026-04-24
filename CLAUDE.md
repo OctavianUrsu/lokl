@@ -33,8 +33,13 @@ src/
 │   ├── login/              # login page
 │   ├── signup/             # signup page (creates profile in DB)
 │   ├── logout/             # POST endpoint, signs out
-│   ├── profile/            # view profile
+│   ├── profile/            # view profile + my services list
 │   │   └── edit/           # edit profile form
+│   ├── services/           # browse all services (category filter)
+│   │   ├── new/            # create service (provider only)
+│   │   └── [id]/           # service detail (public)
+│   │       └── edit/       # edit service (owner only)
+│   ├── users/[id]/         # public user profile
 │   └── api/                # REST endpoints (+server.ts)
 ├── hooks.server.ts         # Supabase SSR client per request
 ├── app.html
