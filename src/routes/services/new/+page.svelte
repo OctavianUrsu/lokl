@@ -42,4 +42,5 @@
 		<input type="text" name="location" id="location" />
 	</div>
 	<button type="submit">Create Service</button>
+	<a href="/services">Cancel</a>
 </form>
