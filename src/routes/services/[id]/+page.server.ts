@@ -4,7 +4,7 @@ import type { PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
 import { services, profiles } from '$lib/server/schema';
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ params, locals }) => {
 	const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 	if (!uuidRegex.test(params.id)) {
 		error(404, 'Service not found');
@@ -30,5 +30,8 @@ export const load: PageServerLoad = async ({ params }) => {
 		error(404, 'Service not found');
 	}
 
-	return { service };
+	const { user } = await locals.safeGetSession();
+	const isOwner = user?.id === service.providerId;
+
+	return { service, isOwner };
 };

@@ -23,3 +23,7 @@
 	<dt>Posted</dt>
 	<dd>{new Date(data.service.createdAt).toLocaleDateString()}</dd>
 </dl>
+
+{#if data.isOwner}
+	<a href="/services/{data.service.id}/edit">Edit Service</a>
+{/if}
