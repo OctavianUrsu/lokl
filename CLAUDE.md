@@ -22,20 +22,25 @@ src/
 │   ├── server/
 │   │   ├── db.ts           # Drizzle client
 │   │   └── schema.ts       # Drizzle table definitions
+│   ├── supabase.ts         # browser Supabase client
 │   ├── types/              # TypeScript types
 │   └── utils/              # shared helpers
 ├── routes/
-│   ├── +layout.svelte      # root layout
+│   ├── +layout.svelte      # root layout + auth-aware nav
 │   ├── +layout.server.ts   # pass session/user to all pages
 │   ├── +page.svelte        # homepage
-│   ├── api/                # REST endpoints (+server.ts)
-│   └── [feature]/          # page routes
-│       ├── +page.svelte
-│       └── +page.server.ts # server-side data loading
+│   ├── auth/callback/      # email confirmation callback
+│   ├── login/              # login page
+│   ├── signup/             # signup page (creates profile in DB)
+│   ├── logout/             # POST endpoint, signs out
+│   ├── profile/            # view profile
+│   │   └── edit/           # edit profile form
+│   └── api/                # REST endpoints (+server.ts)
 ├── hooks.server.ts         # Supabase SSR client per request
 ├── app.html
 └── app.d.ts
 drizzle.config.ts               # Drizzle Kit config
+supabase/config.toml            # Supabase local dev config
 ```
 
 ## Conventions
