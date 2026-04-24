@@ -11,6 +11,7 @@
 <header>
 	<nav>
 		<a href="/">Home</a>
+		<a href="/services">Services</a>
 		{#if data.session}
 			{#if data.profile?.role === 'provider'}
 				<a href="/services/new">Post Service</a>
