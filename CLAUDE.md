@@ -45,3 +45,6 @@ drizzle.config.ts               # Drizzle Kit config
 - `$lib` alias for imports from `src/lib/`
 - `src/lib/server/` for server-only code (DB, secrets) — SvelteKit blocks client import
 - API endpoints go under `src/routes/api/`
+- Env vars in `.env` (not `.env.local`) — works with both SvelteKit and Drizzle Kit
+- DB migrations: `pnpm drizzle-kit generate` then `pnpm drizzle-kit migrate`
+- `drizzle/` folder committed to git (migration history)
