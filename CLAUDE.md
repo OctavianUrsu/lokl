@@ -39,6 +39,8 @@ src/
 │   │   ├── new/            # create service (provider only)
 │   │   └── [id]/           # service detail (public)
 │   │       └── edit/       # edit service (owner only)
+│   ├── bookings/           # customer bookings list + mark complete
+│   │   └── requests/       # provider booking requests (accept/decline)
 │   ├── users/[id]/         # public user profile
 │   └── api/                # REST endpoints (+server.ts)
 ├── hooks.server.ts         # Supabase SSR client per request
