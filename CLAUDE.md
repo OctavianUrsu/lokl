@@ -3,6 +3,7 @@
 ## Project
 
 SvelteKit app (TypeScript). Bare project, early stage.
+Package manager: pnpm (use `pnpm` not `npm`).
 
 ## Structure
 
