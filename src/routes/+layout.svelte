@@ -12,6 +12,9 @@
 	<nav>
 		<a href="/">Home</a>
 		{#if data.session}
+			{#if data.profile?.role === 'provider'}
+				<a href="/services/new">Post Service</a>
+			{/if}
 			<a href="/profile">Profile</a>
 			<form method="POST" action="/logout" style="display:inline">
 				<button type="submit">Sign Out</button>
