@@ -50,6 +50,12 @@ drizzle.config.ts               # Drizzle Kit config
 supabase/config.toml            # Supabase local dev config
 ```
 
+## Linting & Formatting
+
+- **Prettier** + **ESLint** via `pnpm lint` (check) / `pnpm lint:fix` (auto-fix)
+- **Husky** + **lint-staged** run prettier + eslint on pre-commit
+- Prettier config: tabs, single quotes, no trailing commas, printWidth 120
+
 ## Conventions
 
 - `+server.ts` for API endpoints (GET, POST, etc.)
