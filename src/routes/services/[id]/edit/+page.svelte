@@ -50,4 +50,5 @@
 		<input type="text" name="location" id="location" value={data.service.location ?? ''} />
 	</div>
 	<button type="submit">Edit Service</button>
+	<a href="/services/{data.service.id}">Cancel</a>
 </form>
