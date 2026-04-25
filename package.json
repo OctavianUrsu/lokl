@@ -13,9 +13,7 @@
 		"lint": "prettier --check . && eslint .",
 		"lint:fix": "prettier --write . && eslint --fix .",
 		"format": "prettier --write .",
-		"db:migrate": "drizzle-kit migrate",
-		"supabase:start": "supabase start",
-		"supabase:stop": "supabase stop"
+		"db:migrate": "drizzle-kit migrate"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^2.0.4",
