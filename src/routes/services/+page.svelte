@@ -7,7 +7,7 @@
 <h1>Browse Services</h1>
 
 <nav style="display:flex; gap:1rem;">
-	<a href="/services">All</a>
+	<a href="/services" class:active={!data.category}>All</a>
 	{#each categories as cat (cat)}
 		<a href="/services?category={cat}" class:active={data.category === cat}>{cat}</a>
 	{/each}
@@ -32,3 +32,10 @@
 		{/each}
 	</ul>
 {/if}
+
+<style>
+	nav a.active {
+		color: palevioletred;
+		font-weight: bold;
+	}
+</style>
