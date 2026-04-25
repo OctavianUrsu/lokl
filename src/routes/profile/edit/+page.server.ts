@@ -1,8 +1,6 @@
 import { fail, redirect } from '@sveltejs/kit';
-import { eq } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types';
-import { db } from '$lib/server/db';
-import { profiles } from '$lib/server/schema';
+import { getProfileById, updateProfile } from '$lib/server/repositories/profiles';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const { session, user } = await locals.safeGetSession();
@@ -11,7 +9,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 		redirect(303, '/login');
 	}
 
-	const [profile] = await db.select().from(profiles).where(eq(profiles.id, user.id));
+	const profile = await getProfileById(user.id);
 
 	if (!profile) {
 		redirect(303, '/signup');
@@ -37,15 +35,7 @@ export const actions: Actions = {
 			return fail(400, { error: 'Name is required.' });
 		}
 
-		await db
-			.update(profiles)
-			.set({
-				fullName,
-				phone: phone || null,
-				bio: bio || null,
-				updatedAt: new Date()
-			})
-			.where(eq(profiles.id, user.id));
+		await updateProfile(user.id, { fullName, phone: phone || null, bio: bio || null });
 
 		redirect(303, '/profile');
 	}

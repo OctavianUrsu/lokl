@@ -1,10 +1,8 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
-import { bookings, profiles, reviews, services } from '$lib/server/schema';
-import { db } from '$lib/server/db';
 import { isUuid } from '$lib/utils/uuid';
-import { alias } from 'drizzle-orm/pg-core';
-import { eq } from 'drizzle-orm';
+import { getBookingDetail, getBookingForAuth, updateBookingStatus } from '$lib/server/repositories/bookings';
+import { createReview, getReviewByBookingId } from '$lib/server/repositories/reviews';
 
 export const load: PageServerLoad = async ({ params, locals, url }) => {
 	const { user } = await locals.safeGetSession();
@@ -16,29 +14,7 @@ export const load: PageServerLoad = async ({ params, locals, url }) => {
 		error(404, 'Booking not found');
 	}
 
-	const providerProfile = alias(profiles, 'provider_profile');
-
-	const [booking] = await db
-		.select({
-			id: bookings.id,
-			status: bookings.status,
-			scheduledAt: bookings.scheduledAt,
-			note: bookings.note,
-			createdAt: bookings.createdAt,
-			serviceTitle: services.title,
-			serviceId: services.id,
-			providerId: services.providerId,
-			providerName: providerProfile.fullName,
-			providerPhone: providerProfile.phone,
-			customerName: profiles.fullName,
-			customerPhone: profiles.phone,
-			customerId: bookings.customerId
-		})
-		.from(bookings)
-		.innerJoin(services, eq(bookings.serviceId, services.id))
-		.innerJoin(profiles, eq(bookings.customerId, profiles.id))
-		.innerJoin(providerProfile, eq(services.providerId, providerProfile.id))
-		.where(eq(bookings.id, params.id));
+	const booking = await getBookingDetail(params.id);
 
 	if (!booking || (user.id !== booking.customerId && user.id !== booking.providerId)) {
 		error(404, 'Booking not found');
@@ -49,35 +25,14 @@ export const load: PageServerLoad = async ({ params, locals, url }) => {
 		booking.providerPhone = null;
 	}
 
-	const [review] = await db
-		.select({
-			id: reviews.id,
-			rating: reviews.rating,
-			comment: reviews.comment,
-			createdAt: reviews.createdAt
-		})
-		.from(reviews)
-		.where(eq(reviews.bookingId, booking.id));
+	const review = await getReviewByBookingId(booking.id);
 
 	return {
 		booking,
-		review: review ?? null,
+		review,
 		viewerRole: user.id === booking.providerId ? 'provider' : 'customer'
 	};
 };
-
-async function loadBookingFor(bookingId: string) {
-	const [b] = await db
-		.select({
-			status: bookings.status,
-			customerId: bookings.customerId,
-			providerId: services.providerId
-		})
-		.from(bookings)
-		.innerJoin(services, eq(bookings.serviceId, services.id))
-		.where(eq(bookings.id, bookingId));
-	return b;
-}
 
 export const actions: Actions = {
 	complete: async ({ params, locals }) => {
@@ -85,12 +40,12 @@ export const actions: Actions = {
 		if (!user) redirect(303, '/login');
 		if (!isUuid(params.id)) return fail(404, { error: 'Booking not found' });
 
-		const b = await loadBookingFor(params.id);
+		const b = await getBookingForAuth(params.id);
 		if (!b) return fail(404, { error: 'Booking not found' });
 		if (b.customerId !== user.id) return fail(403, { error: 'Not your booking' });
 		if (b.status !== 'confirmed') return fail(400, { error: 'Booking must be confirmed first' });
 
-		await db.update(bookings).set({ status: 'completed', updatedAt: new Date() }).where(eq(bookings.id, params.id));
+		await updateBookingStatus(params.id, 'completed');
 		return { success: true };
 	},
 
@@ -99,12 +54,12 @@ export const actions: Actions = {
 		if (!user) redirect(303, '/login');
 		if (!isUuid(params.id)) return fail(404, { error: 'Booking not found' });
 
-		const b = await loadBookingFor(params.id);
+		const b = await getBookingForAuth(params.id);
 		if (!b) return fail(404, { error: 'Booking not found' });
 		if (b.providerId !== user.id) return fail(403, { error: 'Not your booking' });
 		if (b.status !== 'pending') return fail(400, { error: 'Booking must be pending' });
 
-		await db.update(bookings).set({ status: 'confirmed', updatedAt: new Date() }).where(eq(bookings.id, params.id));
+		await updateBookingStatus(params.id, 'confirmed');
 		return { success: true };
 	},
 
@@ -113,12 +68,12 @@ export const actions: Actions = {
 		if (!user) redirect(303, '/login');
 		if (!isUuid(params.id)) return fail(404, { error: 'Booking not found' });
 
-		const b = await loadBookingFor(params.id);
+		const b = await getBookingForAuth(params.id);
 		if (!b) return fail(404, { error: 'Booking not found' });
 		if (b.providerId !== user.id) return fail(403, { error: 'Not your booking' });
 		if (b.status !== 'pending') return fail(400, { error: 'Booking must be pending' });
 
-		await db.update(bookings).set({ status: 'cancelled', updatedAt: new Date() }).where(eq(bookings.id, params.id));
+		await updateBookingStatus(params.id, 'cancelled');
 		return { success: true };
 	},
 
@@ -127,7 +82,7 @@ export const actions: Actions = {
 		if (!user) redirect(303, '/login');
 		if (!isUuid(params.id)) return fail(404, { error: 'Booking not found' });
 
-		const b = await loadBookingFor(params.id);
+		const b = await getBookingForAuth(params.id);
 		if (!b) return fail(404, { error: 'Booking not found' });
 		if (b.customerId !== user.id) return fail(403, { error: 'Only the customer can review' });
 		if (b.status !== 'completed') return fail(400, { error: 'Booking must be completed first' });
@@ -140,10 +95,10 @@ export const actions: Actions = {
 			return fail(400, { error: 'Rating must be 1-5' });
 		}
 
-		const [existing] = await db.select({ id: reviews.id }).from(reviews).where(eq(reviews.bookingId, params.id));
+		const existing = await getReviewByBookingId(params.id);
 		if (existing) return fail(400, { error: 'Booking already reviewed' });
 
-		await db.insert(reviews).values({
+		await createReview({
 			bookingId: params.id,
 			reviewerId: user.id,
 			rating,

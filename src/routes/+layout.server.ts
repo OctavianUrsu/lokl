@@ -1,7 +1,5 @@
-import { eq } from 'drizzle-orm';
 import type { LayoutServerLoad } from './$types';
-import { db } from '$lib/server/db';
-import { profiles } from '$lib/server/schema';
+import { getProfileRoleById } from '$lib/server/repositories/profiles';
 
 export const load: LayoutServerLoad = async ({ locals }) => {
 	const { session, user } = await locals.safeGetSession();
@@ -10,7 +8,7 @@ export const load: LayoutServerLoad = async ({ locals }) => {
 		return { session: null, user: null, profile: null };
 	}
 
-	const [profile] = await db.select({ role: profiles.role }).from(profiles).where(eq(profiles.id, user.id));
+	const role = await getProfileRoleById(user.id);
 
-	return { session, user, profile: profile ?? null };
+	return { session, user, profile: role ? { role } : null };
 };

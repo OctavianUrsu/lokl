@@ -1,8 +1,6 @@
 import { redirect } from '@sveltejs/kit';
-import { eq } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
-import { db } from '$lib/server/db';
-import { bookings, services, profiles } from '$lib/server/schema';
+import { listBookingsByCustomer } from '$lib/server/repositories/bookings';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const { session, user } = await locals.safeGetSession();
@@ -11,22 +9,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 		redirect(303, '/login');
 	}
 
-	const myBookings = await db
-		.select({
-			id: bookings.id,
-			status: bookings.status,
-			scheduledAt: bookings.scheduledAt,
-			note: bookings.note,
-			createdAt: bookings.createdAt,
-			serviceTitle: services.title,
-			serviceId: services.id,
-			providerId: profiles.id,
-			providerName: profiles.fullName
-		})
-		.from(bookings)
-		.innerJoin(services, eq(bookings.serviceId, services.id))
-		.innerJoin(profiles, eq(services.providerId, profiles.id))
-		.where(eq(bookings.customerId, user.id));
+	const myBookings = await listBookingsByCustomer(user.id);
 
 	return { bookings: myBookings };
 };

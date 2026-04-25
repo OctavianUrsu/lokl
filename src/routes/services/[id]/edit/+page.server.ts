@@ -1,9 +1,7 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
-import { db } from '$lib/server/db';
-import { services } from '$lib/server/schema';
-import { eq } from 'drizzle-orm';
 import { isUuid } from '$lib/utils/uuid';
+import { getServiceById, updateService } from '$lib/server/repositories/services';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
 	const { session, user } = await locals.safeGetSession();
@@ -15,7 +13,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		error(404, 'Service not found');
 	}
 
-	const [service] = await db.select().from(services).where(eq(services.id, params.id));
+	const service = await getServiceById(params.id);
 
 	if (!service) {
 		error(404, 'Service not found');
@@ -36,7 +34,7 @@ export const actions: Actions = {
 			redirect(303, '/login');
 		}
 
-		const [service] = await db.select().from(services).where(eq(services.id, params.id));
+		const service = await getServiceById(params.id);
 
 		if (!service) {
 			error(404, 'Service not found');
@@ -61,17 +59,13 @@ export const actions: Actions = {
 			return fail(400, { error: 'Price must be a positive number' });
 		}
 
-		await db
-			.update(services)
-			.set({
-				title,
-				description,
-				category,
-				price,
-				location: location || null,
-				updatedAt: new Date()
-			})
-			.where(eq(services.id, params.id));
+		await updateService(params.id, {
+			title,
+			description,
+			category,
+			price,
+			location: location || null
+		});
 
 		redirect(303, `/services/${params.id}`);
 	}

@@ -1,7 +1,6 @@
 import { fail } from '@sveltejs/kit';
 import type { Actions } from './$types';
-import { db } from '$lib/server/db';
-import { profiles } from '$lib/server/schema';
+import { createProfile } from '$lib/server/repositories/profiles';
 
 export const actions: Actions = {
 	default: async ({ request, locals }) => {
@@ -33,12 +32,7 @@ export const actions: Actions = {
 		}
 
 		if (data.user) {
-			await db.insert(profiles).values({
-				id: data.user.id,
-				email,
-				fullName,
-				role
-			});
+			await createProfile({ id: data.user.id, email, fullName, role });
 		}
 
 		return { success: true };
