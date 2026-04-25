@@ -8,7 +8,13 @@ export const handle: Handle = async ({ event, resolve }) => {
 			getAll: () => event.cookies.getAll(),
 			setAll: (cookiesToSet) => {
 				cookiesToSet.forEach(({ name, value, options }) => {
-					event.cookies.set(name, value, { ...options, path: '/' });
+					try {
+						event.cookies.set(name, value, { ...options, path: '/' });
+					} catch {
+						// Supabase fires token-refresh callbacks after the response has
+						// been sent; ignore the resulting "response already generated"
+						// error so the dev process does not crash.
+					}
 				});
 			}
 		}
