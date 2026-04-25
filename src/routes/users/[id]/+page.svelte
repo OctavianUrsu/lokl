@@ -8,6 +8,18 @@
 	<dt>Role</dt>
 	<dd>{data.profile.role}</dd>
 
+	{#if data.rating}
+		<dt>Rating</dt>
+		<dd>
+			{#if data.rating.count > 0}
+				{data.rating.avg?.toFixed(1)} ★ ({data.rating.count}
+				{data.rating.count === 1 ? 'review' : 'reviews'})
+			{:else}
+				No reviews yet
+			{/if}
+		</dd>
+	{/if}
+
 	<dt>Bio</dt>
 	<dd>{data.profile.bio ?? 'No bio yet'}</dd>
 

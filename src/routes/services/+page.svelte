@@ -28,6 +28,9 @@
 				{#if service.location}
 					<span> · {service.location}</span>
 				{/if}
+				<span>
+					· {service.ratingCount > 0 ? `${service.ratingAvg?.toFixed(1)} ★ (${service.ratingCount})` : 'No reviews'}
+				</span>
 			</li>
 		{/each}
 	</ul>

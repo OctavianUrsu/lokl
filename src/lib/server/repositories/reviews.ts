@@ -1,6 +1,6 @@
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { db } from '$lib/server/db';
-import { reviews } from '$lib/server/schema';
+import { bookings, reviews, services } from '$lib/server/schema';
 
 export async function getReviewByBookingId(bookingId: string) {
 	const [review] = await db
@@ -22,4 +22,29 @@ export async function createReview(values: {
 	comment: string | null;
 }) {
 	await db.insert(reviews).values(values);
+}
+
+export async function getServiceRating(serviceId: string) {
+	const [row] = await db
+		.select({
+			avg: sql<number | null>`AVG(${reviews.rating})::float`,
+			count: sql<number>`COUNT(*)::int`
+		})
+		.from(reviews)
+		.innerJoin(bookings, eq(reviews.bookingId, bookings.id))
+		.where(eq(bookings.serviceId, serviceId));
+	return { avg: row?.avg ?? null, count: row?.count ?? 0 };
+}
+
+export async function getProviderRating(providerId: string) {
+	const [row] = await db
+		.select({
+			avg: sql<number | null>`AVG(${reviews.rating})::float`,
+			count: sql<number>`COUNT(*)::int`
+		})
+		.from(reviews)
+		.innerJoin(bookings, eq(reviews.bookingId, bookings.id))
+		.innerJoin(services, eq(bookings.serviceId, services.id))
+		.where(eq(services.providerId, providerId));
+	return { avg: row?.avg ?? null, count: row?.count ?? 0 };
 }

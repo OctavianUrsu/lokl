@@ -1,6 +1,6 @@
-import { and, eq } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { db } from '$lib/server/db';
-import { profiles, services } from '$lib/server/schema';
+import { bookings, profiles, reviews, services } from '$lib/server/schema';
 
 type ServiceStatus = (typeof services.status.enumValues)[number];
 
@@ -41,6 +41,18 @@ export async function listServices(filter: { category?: string | null } = {}) {
 	const where = filter.category
 		? and(eq(services.status, 'active'), eq(services.category, filter.category))
 		: eq(services.status, 'active');
+
+	const ratings = db
+		.select({
+			serviceId: bookings.serviceId,
+			avg: sql<number | null>`AVG(${reviews.rating})::float`.as('avg_rating'),
+			count: sql<number>`COUNT(*)::int`.as('review_count')
+		})
+		.from(reviews)
+		.innerJoin(bookings, eq(reviews.bookingId, bookings.id))
+		.groupBy(bookings.serviceId)
+		.as('service_ratings');
+
 	return db
 		.select({
 			id: services.id,
@@ -51,10 +63,13 @@ export async function listServices(filter: { category?: string | null } = {}) {
 			status: services.status,
 			createdAt: services.createdAt,
 			providerId: services.providerId,
-			providerName: profiles.fullName
+			providerName: profiles.fullName,
+			ratingAvg: ratings.avg,
+			ratingCount: sql<number>`COALESCE(${ratings.count}, 0)::int`
 		})
 		.from(services)
 		.innerJoin(profiles, eq(services.providerId, profiles.id))
+		.leftJoin(ratings, eq(ratings.serviceId, services.id))
 		.where(where);
 }
 

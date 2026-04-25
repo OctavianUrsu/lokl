@@ -20,6 +20,16 @@
 	<dt>Status</dt>
 	<dd>{data.service.status}</dd>
 
+	<dt>Rating</dt>
+	<dd>
+		{#if data.rating.count > 0}
+			{data.rating.avg?.toFixed(1)} ★ ({data.rating.count}
+			{data.rating.count === 1 ? 'review' : 'reviews'})
+		{:else}
+			No reviews yet
+		{/if}
+	</dd>
+
 	<dt>Category</dt>
 	<dd>{data.service.category}</dd>
 

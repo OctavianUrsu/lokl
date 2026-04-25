@@ -3,6 +3,7 @@ import type { PageServerLoad, Actions } from './$types';
 import { isUuid } from '$lib/utils/uuid';
 import { getServiceProviderAndStatus, getServiceWithProvider } from '$lib/server/repositories/services';
 import { createBooking, customerHasBookingForService } from '$lib/server/repositories/bookings';
+import { getServiceRating } from '$lib/server/repositories/reviews';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
 	if (!isUuid(params.id)) {
@@ -19,9 +20,12 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	const isOwner = user?.id === service.providerId;
 	const isLoggedIn = !!user;
 
-	const hasActiveBooking = user && !isOwner ? await customerHasBookingForService(service.id, user.id) : false;
+	const [hasActiveBooking, rating] = await Promise.all([
+		user && !isOwner ? customerHasBookingForService(service.id, user.id) : Promise.resolve(false),
+		getServiceRating(service.id)
+	]);
 
-	return { service, isOwner, isLoggedIn, hasActiveBooking };
+	return { service, isOwner, isLoggedIn, hasActiveBooking, rating };
 };
 
 export const actions: Actions = {
