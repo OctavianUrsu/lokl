@@ -8,6 +8,13 @@
       "when": 1777045324513,
       "tag": "0000_freezing_nightshade",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1777150032089,
+      "tag": "0001_gray_nightmare",
+      "breakpoints": true
     }
   ]
 }

@@ -54,6 +54,7 @@ export const reviews = pgTable('reviews', {
 	id: uuid('id').primaryKey().defaultRandom(),
 	bookingId: uuid('booking_id')
 		.notNull()
+		.unique()
 		.references(() => bookings.id),
 	reviewerId: uuid('reviewer_id')
 		.notNull()

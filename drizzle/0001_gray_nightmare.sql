@@ -1,0 +1,1 @@
+ALTER TABLE "reviews" ADD CONSTRAINT "reviews_booking_id_unique" UNIQUE("booking_id");

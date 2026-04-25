@@ -1,6 +1,6 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
-import { bookings, profiles, services } from '$lib/server/schema';
+import { bookings, profiles, reviews, services } from '$lib/server/schema';
 import { db } from '$lib/server/db';
 import { isUuid } from '$lib/utils/uuid';
 import { alias } from 'drizzle-orm/pg-core';
@@ -49,7 +49,21 @@ export const load: PageServerLoad = async ({ params, locals, url }) => {
 		booking.providerPhone = null;
 	}
 
-	return { booking, viewerRole: user.id === booking.providerId ? 'provider' : 'customer' };
+	const [review] = await db
+		.select({
+			id: reviews.id,
+			rating: reviews.rating,
+			comment: reviews.comment,
+			createdAt: reviews.createdAt
+		})
+		.from(reviews)
+		.where(eq(reviews.bookingId, booking.id));
+
+	return {
+		booking,
+		review: review ?? null,
+		viewerRole: user.id === booking.providerId ? 'provider' : 'customer'
+	};
 };
 
 async function loadBookingFor(bookingId: string) {
@@ -105,6 +119,37 @@ export const actions: Actions = {
 		if (b.status !== 'pending') return fail(400, { error: 'Booking must be pending' });
 
 		await db.update(bookings).set({ status: 'cancelled', updatedAt: new Date() }).where(eq(bookings.id, params.id));
+		return { success: true };
+	},
+
+	review: async ({ params, request, locals }) => {
+		const { user } = await locals.safeGetSession();
+		if (!user) redirect(303, '/login');
+		if (!isUuid(params.id)) return fail(404, { error: 'Booking not found' });
+
+		const b = await loadBookingFor(params.id);
+		if (!b) return fail(404, { error: 'Booking not found' });
+		if (b.customerId !== user.id) return fail(403, { error: 'Only the customer can review' });
+		if (b.status !== 'completed') return fail(400, { error: 'Booking must be completed first' });
+
+		const formData = await request.formData();
+		const rating = Number(formData.get('rating'));
+		const comment = (formData.get('comment') as string | null)?.trim() || null;
+
+		if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+			return fail(400, { error: 'Rating must be 1-5' });
+		}
+
+		const [existing] = await db.select({ id: reviews.id }).from(reviews).where(eq(reviews.bookingId, params.id));
+		if (existing) return fail(400, { error: 'Booking already reviewed' });
+
+		await db.insert(reviews).values({
+			bookingId: params.id,
+			reviewerId: user.id,
+			rating,
+			comment
+		});
+
 		return { success: true };
 	}
 };
