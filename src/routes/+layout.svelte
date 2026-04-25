@@ -30,3 +30,22 @@
 </header>
 
 {@render children()}
+
+<style>
+	:global(body) {
+		background-color: black;
+		color: palevioletred;
+	}
+
+	:global(a) {
+		color: lightgreen;
+	}
+
+	:global(a:hover) {
+		color: white;
+	}
+
+	:global(a:active) {
+		color: palegreen;
+	}
+</style>
