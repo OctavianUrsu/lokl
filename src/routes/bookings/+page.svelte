@@ -16,9 +16,6 @@
 				<span> · {booking.status}</span>
 				<span> · {new Date(booking.scheduledAt).toLocaleDateString()}</span>
 				<span> · by <a href="/users/{booking.providerId}">{booking.providerName}</a></span>
-				{#if booking.note}
-					<p>Note: {booking.note}</p>
-				{/if}
 			</li>
 		{/each}
 	</ul>

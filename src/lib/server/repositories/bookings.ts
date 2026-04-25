@@ -58,7 +58,6 @@ export async function listBookingsByCustomer(customerId: string) {
 			id: bookings.id,
 			status: bookings.status,
 			scheduledAt: bookings.scheduledAt,
-			note: bookings.note,
 			createdAt: bookings.createdAt,
 			serviceTitle: services.title,
 			serviceId: services.id,
