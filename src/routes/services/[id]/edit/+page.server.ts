@@ -3,6 +3,7 @@ import type { PageServerLoad, Actions } from './$types';
 import { db } from '$lib/server/db';
 import { services } from '$lib/server/schema';
 import { eq } from 'drizzle-orm';
+import { isUuid } from '$lib/utils/uuid';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
 	const { session, user } = await locals.safeGetSession();
@@ -10,8 +11,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		redirect(303, '/login');
 	}
 
-	const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-	if (!uuidRegex.test(params.id)) {
+	if (!isUuid(params.id)) {
 		error(404, 'Service not found');
 	}
 

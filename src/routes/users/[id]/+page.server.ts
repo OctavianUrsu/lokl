@@ -3,10 +3,10 @@ import { eq } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
 import { profiles } from '$lib/server/schema';
+import { isUuid } from '$lib/utils/uuid';
 
 export const load: PageServerLoad = async ({ params }) => {
-	const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-	if (!uuidRegex.test(params.id)) {
+	if (!isUuid(params.id)) {
 		error(404, 'User not found');
 	}
 
