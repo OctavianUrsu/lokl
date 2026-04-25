@@ -34,7 +34,7 @@
 				<a href="/services/{service.id}">
 					<strong>{service.title}</strong>
 				</a>
-				<span> — ${service.price} · {service.category}</span>
+				<span> — ${service.price} · {service.category} · {service.status}</span>
 				<a href="/services/{service.id}/edit">Edit</a>
 			</li>
 		{/each}

@@ -3,6 +3,7 @@ import { pgTable, uuid, text, timestamp, numeric, integer, pgEnum } from 'drizzl
 // Enums
 export const userRoleEnum = pgEnum('user_role', ['customer', 'provider', 'admin']);
 export const bookingStatusEnum = pgEnum('booking_status', ['pending', 'confirmed', 'completed', 'cancelled']);
+export const serviceStatusEnum = pgEnum('service_status', ['active', 'paused', 'archived']);
 
 // Profiles — extends Supabase auth.users
 export const profiles = pgTable('profiles', {
@@ -29,6 +30,7 @@ export const services = pgTable('services', {
 	price: numeric('price', { precision: 10, scale: 2 }).notNull(),
 	location: text('location'),
 	imageUrl: text('image_url'),
+	status: serviceStatusEnum('status').notNull().default('active'),
 	createdAt: timestamp('created_at').defaultNow().notNull(),
 	updatedAt: timestamp('updated_at').defaultNow().notNull()
 });

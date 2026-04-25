@@ -41,6 +41,14 @@
 		<label for="location">Location (optional)</label>
 		<input type="text" name="location" id="location" value={data.service.location ?? ''} />
 	</div>
+	<div>
+		<label for="status">Status</label>
+		<select name="status" id="status" value={data.service.status} required>
+			<option value="active">Active — listed and bookable</option>
+			<option value="paused">Paused — hidden, not bookable, existing bookings continue</option>
+			<option value="archived">Archived — hidden permanently, history preserved</option>
+		</select>
+	</div>
 	<button type="submit">Edit Service</button>
 	<a href="/services/{data.service.id}">Cancel</a>
 </form>

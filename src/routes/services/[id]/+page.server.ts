@@ -1,7 +1,7 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
 import { isUuid } from '$lib/utils/uuid';
-import { getServiceProviderId, getServiceWithProvider } from '$lib/server/repositories/services';
+import { getServiceProviderAndStatus, getServiceWithProvider } from '$lib/server/repositories/services';
 import { createBooking, customerHasBookingForService } from '$lib/server/repositories/bookings';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
@@ -40,14 +40,18 @@ export const actions: Actions = {
 			return fail(400, { error: 'Please select a date.' });
 		}
 
-		const providerId = await getServiceProviderId(params.id);
+		const service = await getServiceProviderAndStatus(params.id);
 
-		if (!providerId) {
+		if (!service) {
 			error(404, 'Service not found');
 		}
 
-		if (providerId === user.id) {
+		if (service.providerId === user.id) {
 			return fail(400, { error: "You can't book your own service." });
+		}
+
+		if (service.status !== 'active') {
+			return fail(400, { error: 'This service is not currently accepting bookings.' });
 		}
 
 		await createBooking({

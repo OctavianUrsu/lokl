@@ -15,6 +15,13 @@
       "when": 1777150032089,
       "tag": "0001_gray_nightmare",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1777153276455,
+      "tag": "0002_icy_thunderball",
+      "breakpoints": true
     }
   ]
 }

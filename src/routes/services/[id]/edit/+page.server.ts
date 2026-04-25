@@ -1,7 +1,7 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
 import { isUuid } from '$lib/utils/uuid';
-import { getServiceById, updateService } from '$lib/server/repositories/services';
+import { SERVICE_STATUSES, getServiceById, updateService } from '$lib/server/repositories/services';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
 	const { session, user } = await locals.safeGetSession();
@@ -50,6 +50,7 @@ export const actions: Actions = {
 		const category = formData.get('category') as string;
 		const price = formData.get('price') as string;
 		const location = formData.get('location') as string;
+		const status = formData.get('status') as string;
 
 		if (!title || !description || !category || !price) {
 			return fail(400, { error: 'All fields are required' });
@@ -59,12 +60,17 @@ export const actions: Actions = {
 			return fail(400, { error: 'Price must be a positive number' });
 		}
 
+		if (!SERVICE_STATUSES.includes(status as (typeof SERVICE_STATUSES)[number])) {
+			return fail(400, { error: 'Invalid status' });
+		}
+
 		await updateService(params.id, {
 			title,
 			description,
 			category,
 			price,
-			location: location || null
+			location: location || null,
+			status: status as (typeof SERVICE_STATUSES)[number]
 		});
 
 		redirect(303, `/services/${params.id}`);

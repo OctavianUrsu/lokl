@@ -2,13 +2,23 @@
 	import { enhance } from '$app/forms';
 
 	let { data, form } = $props();
+	const isActive = $derived(data.service.status === 'active');
 </script>
 
 <h1>{data.service.title}</h1>
 
+{#if data.service.status === 'paused'}
+	<p style="color: orange">This service is currently paused and not accepting new bookings.</p>
+{:else if data.service.status === 'archived'}
+	<p style="color: tomato">This service has been archived and is no longer available.</p>
+{/if}
+
 <dl>
 	<dt>Provider</dt>
 	<dd><a href="/users/{data.service.providerId}">{data.service.providerName}</a></dd>
+
+	<dt>Status</dt>
+	<dd>{data.service.status}</dd>
 
 	<dt>Category</dt>
 	<dd>{data.service.category}</dd>
@@ -28,6 +38,8 @@
 
 {#if data.isOwner}
 	<a href="/services/{data.service.id}/edit">Edit Service</a>
+{:else if !isActive}
+	<!-- booking blocked by status banner above -->
 {:else if form?.booked}
 	<p>Booking submitted! Waiting for provider to confirm.</p>
 {:else if data.hasActiveBooking}
