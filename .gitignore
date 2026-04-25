@@ -21,3 +21,6 @@ Thumbs.db
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Supabase Studio scratch queries
+supabase/snippets/
