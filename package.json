@@ -13,6 +13,7 @@
 		"lint": "prettier --check . && eslint .",
 		"lint:fix": "prettier --write . && eslint --fix .",
 		"format": "prettier --write .",
+		"db:generate": "drizzle-kit generate",
 		"db:migrate": "drizzle-kit migrate"
 	},
 	"devDependencies": {

@@ -4,6 +4,7 @@ import { isUuid } from '$lib/utils/uuid';
 import { getServiceProviderAndStatus, getServiceWithProvider } from '$lib/server/repositories/services';
 import { createBooking, customerHasBookingForService } from '$lib/server/repositories/bookings';
 import { getServiceRating } from '$lib/server/repositories/reviews';
+import { listImagesByService } from '$lib/server/repositories/serviceImages';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
 	if (!isUuid(params.id)) {
@@ -20,12 +21,13 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	const isOwner = user?.id === service.providerId;
 	const isLoggedIn = !!user;
 
-	const [hasActiveBooking, rating] = await Promise.all([
+	const [hasActiveBooking, rating, images] = await Promise.all([
 		user && !isOwner ? customerHasBookingForService(service.id, user.id) : Promise.resolve(false),
-		getServiceRating(service.id)
+		getServiceRating(service.id),
+		listImagesByService(service.id)
 	]);
 
-	return { service, isOwner, isLoggedIn, hasActiveBooking, rating };
+	return { service, isOwner, isLoggedIn, hasActiveBooking, rating, images };
 };
 
 export const actions: Actions = {

@@ -29,10 +29,20 @@ export const services = pgTable('services', {
 	category: text('category').notNull(),
 	price: numeric('price', { precision: 10, scale: 2 }).notNull(),
 	location: text('location'),
-	imageUrl: text('image_url'),
 	status: serviceStatusEnum('status').notNull().default('active'),
 	createdAt: timestamp('created_at').defaultNow().notNull(),
 	updatedAt: timestamp('updated_at').defaultNow().notNull()
+});
+
+// Service gallery — up to 5 enforced in app code
+export const serviceImages = pgTable('service_images', {
+	id: uuid('id').primaryKey().defaultRandom(),
+	serviceId: uuid('service_id')
+		.notNull()
+		.references(() => services.id, { onDelete: 'cascade' }),
+	storagePath: text('storage_path').notNull(),
+	position: integer('position').notNull().default(0),
+	createdAt: timestamp('created_at').defaultNow().notNull()
 });
 
 // Bookings

@@ -1,8 +1,11 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { serviceImageUrl } from '$lib/utils/storage';
 
 	let { data, form } = $props();
 	const isActive = $derived(data.service.status === 'active');
+	const hero = $derived(data.images[0] ?? null);
+	const thumbs = $derived(data.images.slice(1));
 </script>
 
 <h1>{data.service.title}</h1>
@@ -11,6 +14,29 @@
 	<p style="color: orange">This service is currently paused and not accepting new bookings.</p>
 {:else if data.service.status === 'archived'}
 	<p style="color: tomato">This service has been archived and is no longer available.</p>
+{/if}
+
+{#if hero}
+	<img
+		src={serviceImageUrl(hero.storagePath)}
+		alt={data.service.title}
+		style="display:block; max-width:100%; max-height:400px; object-fit:cover;"
+		loading="lazy"
+	/>
+	{#if thumbs.length > 0}
+		<ul style="display:flex; gap:0.5rem; list-style:none; padding:0; margin:0.5rem 0;">
+			{#each thumbs as image (image.id)}
+				<li>
+					<img
+						src={serviceImageUrl(image.storagePath)}
+						alt=""
+						style="width:80px; height:80px; object-fit:cover;"
+						loading="lazy"
+					/>
+				</li>
+			{/each}
+		</ul>
+	{/if}
 {/if}
 
 <dl>
